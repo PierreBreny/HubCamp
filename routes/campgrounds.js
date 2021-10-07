@@ -4,8 +4,11 @@ const Campground = require('../models/campground');
 
 // Homepage with listings
 
-router.get('/', (req,res) => {
-    res.render('campgrounds/index');
+router.get('/', async (req,res) => {
+    const campgrounds = await Campground.find({});
+    res.render('campgrounds/index', {campgrounds});
 })
+
+
 
 module.exports = router; 
