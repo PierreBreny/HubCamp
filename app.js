@@ -4,23 +4,26 @@ const mongoose = require("mongoose");
 const dotenv = require('dotenv');
 const Campground = require("./models/campground");
 const expressEjsLayout = require ('express-ejs-layouts');
-const app = express();
+const methodOverride = require('method-override');
 
 dotenv.config();
-
-// Static files for css
-app.use("/static", express.static("public"));
 
 // Mongoose config
 mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopology : true, useUnifiedTopology: true})
 .then(() => console.log("Succesfully connected to Mongo!"))
 .catch((err) => console.log(err));
 
-//EJS
-app.set('view engine','ejs');
+const app = express();
 
+// EJS
+app.set('view engine','ejs');
+// Static files for css
+app.use("/static", express.static("public"));
+// Method override
+app.use(methodOverride('_method'));
 //BodyParser
-app.use(express.urlencoded({extended : false}));
+app.use(express.urlencoded({extended : true}));
+
 
 app.get('/', (req, res) => {
     res.render('home');
