@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const Campground = require("./models/campground");
 const expressEjsLayout = require ('express-ejs-layouts');
 const methodOverride = require('method-override');
+const ejsMate = require("ejs-mate");
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopolo
 const app = express();
 
 // EJS
+app.engine('ejs', ejsMate);
 app.set('view engine','ejs');
 // Static files for css
 app.use("/static", express.static("public"));
