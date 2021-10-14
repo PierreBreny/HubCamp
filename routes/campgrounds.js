@@ -2,13 +2,14 @@ const express = require('express');
 const router  = express.Router();
 const Campground = require('../models/campground');
 const wrapAsync = require('../utilities/wrapAsync');
+const ExpressError = require('../utilities/ExpressError');
 
 // Homepage with all campgrounds
 
-router.get('/', wrapAsync(async (req,res) => {
+router.get('/', async (req,res) => {
     const campgrounds = await Campground.find({});
     res.render('campgrounds/index', {campgrounds});
-}))
+})
 
 // GET Add campground page
 router.get('/new', (req,res) => {
