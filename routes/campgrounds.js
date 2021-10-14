@@ -3,6 +3,7 @@ const router  = express.Router();
 const Campground = require('../models/campground');
 const wrapAsync = require('../utilities/wrapAsync');
 const ExpressError = require('../utilities/ExpressError');
+const Joi = require("joi");
 
 // Homepage with all campgrounds
 
@@ -24,7 +25,20 @@ router.get('/:id', wrapAsync(async (req,res) => {
 
 // Add new
 router.post('/', wrapAsync(async (req, res, next) => {
-    if(!req.body.campground) throw new ExpressError("Invalid Campground Data", 400);
+
+    // Joi validation
+    const campgroundSchema = Joi.object({
+        campground: Joi.object({
+            title: Joi.string().required(),
+            price: Joi.number().required().min(0),
+        }).required()
+    })
+    const { error } = campgroundSchema.validate(req.body)
+    if(error){
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    }
+
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
