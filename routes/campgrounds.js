@@ -1,6 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const Campground = require('../models/campground');
+const wrapAsync = require('../utilities/wrapAsync');
 
 // Homepage with all campgrounds
 
@@ -21,15 +22,11 @@ router.get('/:id', async (req,res) => {
 })
 
 // Add new
-router.post('/', async (req, res, next) => {
-    try {
+router.post('/', wrapAsync(async (req, res, next) => {
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
-    }catch(e){
-        next(e);
-    }
-})
+}))
 
 // GET Edit campground page
 router.get('/:id/edit', async (req, res) => {
