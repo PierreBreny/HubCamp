@@ -48,8 +48,4 @@ router.delete('/:id', wrapAsync(async (req,res) => {
     res.redirect('/campgrounds');
 }))
 
-router.use((err, req, res, next) => {
-    res.send("Something went wrong!")
-})
-
 module.exports = router; 

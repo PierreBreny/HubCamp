@@ -35,6 +35,10 @@ app.get('/', (req, res) => {
 app.use('/', require('./routes/index'));
 app.use('/campgrounds', require('./routes/campgrounds'));
 
+// Error handler
+app.use((err, req, res, next) => {
+    res.send("Something went wrong!")
+})
 
 app.listen(process.env.PORT || 3000, () => {
     console.log("Server is running!")
