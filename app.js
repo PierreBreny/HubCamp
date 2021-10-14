@@ -36,7 +36,6 @@ app.use('/', require('./routes/index'));
 app.use('/campgrounds', require('./routes/campgrounds'));
 
 
-
 app.listen(process.env.PORT || 3000, () => {
     console.log("Server is running!")
 })
