@@ -4,6 +4,17 @@ const Campground = require('../models/campground');
 const wrapAsync = require('../utilities/wrapAsync');
 const ExpressError = require('../utilities/ExpressError');
 const Joi = require("joi");
+const {campgroundSchema} = require("../schemas")
+
+const validateCampground = (req, res, next) => {
+        const { error } = campgroundSchema.validate(req.body)
+        if(error){
+            const msg = error.details.map(el => el.message).join(',');
+            throw new ExpressError(msg, 400);
+        } else {
+            next();
+        }
+}
 
 // Homepage with all campgrounds
 
@@ -24,25 +35,7 @@ router.get('/:id', wrapAsync(async (req,res) => {
 }))
 
 // Add new
-router.post('/', wrapAsync(async (req, res, next) => {
-
-    // Joi validation
-    const campgroundSchema = Joi.object({
-        campground: Joi.object({
-            title: Joi.string().required(),
-            price: Joi.number().required().min(0),
-            image: Joi.string().required(),
-            location: Joi.string().required(),
-            description: Joi.string().required()
-
-        }).required()
-    })
-    const { error } = campgroundSchema.validate(req.body)
-    if(error){
-        const msg = error.details.map(el => el.message).join(',');
-        throw new ExpressError(msg, 400);
-    }
-
+router.post('/', validateCampground, wrapAsync(async (req, res, next) => {
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
@@ -55,7 +48,7 @@ router.get('/:id/edit', wrapAsync(async (req, res) => {
 }))
 
 // Edit campground
-router.put('/:id', wrapAsync(async (req,res) => {
+router.put('/:id', validateCampground, wrapAsync(async (req,res) => {
     const {id} = req.params;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     res.redirect(`/campgrounds/${campground._id}`)
