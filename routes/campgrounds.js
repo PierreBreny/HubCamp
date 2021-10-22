@@ -1,6 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const Campground = require('../models/campground');
+const Review = require('../models/review');
 const wrapAsync = require('../utilities/wrapAsync');
 const ExpressError = require('../utilities/ExpressError');
 const Joi = require("joi");
@@ -54,11 +55,21 @@ router.put('/:id', validateCampground, wrapAsync(async (req,res) => {
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
-// GET Delete
+// Delete campground
 router.delete('/:id', wrapAsync(async (req,res) => {
     const {id} = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
+}))
+
+// Post Review
+router.post('/:id/reviews', wrapAsync(async (req,res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`)
 }))
 
 module.exports = router; 
