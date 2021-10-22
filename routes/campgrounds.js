@@ -72,7 +72,7 @@ router.delete('/:id', wrapAsync(async (req,res) => {
     res.redirect('/campgrounds');
 }))
 
-// Post Review
+// Add Review
 router.post('/:id/reviews', validateReview, wrapAsync(async (req,res) => {
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);
@@ -80,6 +80,14 @@ router.post('/:id/reviews', validateReview, wrapAsync(async (req,res) => {
     await review.save();
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
+}))
+
+// Delete Review
+router.delete('/:id/reviews/:reviewId', wrapAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`)
 }))
 
 module.exports = router; 
