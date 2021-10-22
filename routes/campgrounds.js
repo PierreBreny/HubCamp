@@ -17,16 +17,6 @@ const validateCampground = (req, res, next) => {
         }
 }
 
-const validateReview = (req, res, next) => {
-    const {error} = reviewSchema.validate(req.body)
-    if(error){
-        const msg = error.details.map(el => el.message).join(',');
-        throw new ExpressError(msg, 400);
-    } else {
-        next();
-    }
-}
-
 // Homepage with all campgrounds
 
 router.get('/', async (req,res) => {
@@ -70,24 +60,6 @@ router.delete('/:id', wrapAsync(async (req,res) => {
     const {id} = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
-}))
-
-// Add Review
-router.post('/:id/reviews', validateReview, wrapAsync(async (req,res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
-
-// Delete Review
-router.delete('/:id/reviews/:reviewId', wrapAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`)
 }))
 
 module.exports = router; 

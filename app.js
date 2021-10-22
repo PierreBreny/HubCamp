@@ -2,11 +2,9 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const dotenv = require('dotenv');
-const Campground = require("./models/campground");
 const expressEjsLayout = require ('express-ejs-layouts');
 const methodOverride = require('method-override');
 const ejsMate = require("ejs-mate");
-const wrapAsync = require('./utilities/wrapAsync');
 const ExpressError = require('./utilities/ExpressError');
 
 dotenv.config();
@@ -36,6 +34,7 @@ app.get('/', (req, res) => {
 //Routes
 app.use('/', require('./routes/index'));
 app.use('/campgrounds', require('./routes/campgrounds'));
+app.use('/campgrounds/:id/reviews', require('./routes/reviews'));
 
 // Page not found
 app.all('*', (req, res, next) => {
