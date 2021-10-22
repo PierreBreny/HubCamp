@@ -19,8 +19,9 @@ const app = express();
 // EJS
 app.engine('ejs', ejsMate);
 app.set('view engine','ejs');
+app.set('views', path.join(__dirname, 'views'))
 // Static files for css
-app.use("/static", express.static("public"));
+app.use(express.static(path.join(__dirname, 'public')));
 // Method override
 app.use(methodOverride('_method'));
 //BodyParser
