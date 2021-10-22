@@ -5,7 +5,7 @@ const Review = require('../models/review');
 const wrapAsync = require('../utilities/wrapAsync');
 const ExpressError = require('../utilities/ExpressError');
 const Joi = require("joi");
-const {campgroundSchema} = require("../schemas")
+const { campgroundSchema, reviewSchema } = require("../schemas")
 
 const validateCampground = (req, res, next) => {
         const { error } = campgroundSchema.validate(req.body)
@@ -15,6 +15,16 @@ const validateCampground = (req, res, next) => {
         } else {
             next();
         }
+}
+
+const validateReview = (req, res, next) => {
+    const {error} = reviewSchema.validate(req.body)
+    if(error){
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
 }
 
 // Homepage with all campgrounds
@@ -31,7 +41,7 @@ router.get('/new', (req,res) => {
 
 // Get campground by :id
 router.get('/:id', wrapAsync(async (req,res) => {
-    const campground = await Campground.findById(req.params.id);
+    const campground = await Campground.findById(req.params.id).populate('reviews');
     res.render('campgrounds/show', {campground});
 }))
 
@@ -63,7 +73,7 @@ router.delete('/:id', wrapAsync(async (req,res) => {
 }))
 
 // Post Review
-router.post('/:id/reviews', wrapAsync(async (req,res) => {
+router.post('/:id/reviews', validateReview, wrapAsync(async (req,res) => {
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);
     campground.reviews.push(review);
