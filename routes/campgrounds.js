@@ -53,6 +53,7 @@ router.get('/:id/edit', wrapAsync(async (req, res) => {
 router.put('/:id', validateCampground, wrapAsync(async (req,res) => {
     const {id} = req.params;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+    req.flash('success', 'Your changes were saved!')
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
@@ -60,6 +61,7 @@ router.put('/:id', validateCampground, wrapAsync(async (req,res) => {
 router.delete('/:id', wrapAsync(async (req,res) => {
     const {id} = req.params;
     await Campground.findByIdAndDelete(id);
+    req.flash('success', 'The campground has been deleted.')
     res.redirect('/campgrounds');
 }))
 
