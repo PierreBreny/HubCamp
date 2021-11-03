@@ -2,10 +2,11 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const dotenv = require('dotenv');
-const expressEjsLayout = require ('express-ejs-layouts');
 const methodOverride = require('method-override');
 const ejsMate = require("ejs-mate");
 const ExpressError = require('./utilities/ExpressError');
+const session = require('express-session');
+const flash = require('connect-flash');
 
 dotenv.config();
 
@@ -26,16 +27,37 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
 //BodyParser
 app.use(express.urlencoded({extended : true}));
+//Session
+const sessionConfig = {
+    secret: 'thisshouldbeabettersecret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
+app.use(session(sessionConfig));
+//Flash - to display success or error messages on screen
+app.use(flash());
 
-
-app.get('/', (req, res) => {
-    res.render('home');
+//Flash middleware
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    next();
 })
 
 //Routes
 app.use('/', require('./routes/index'));
 app.use('/campgrounds', require('./routes/campgrounds'));
 app.use('/campgrounds/:id/reviews', require('./routes/reviews'));
+
+// Homepage
+app.get('/', (req, res) => {
+    res.render('home');
+})
+
 
 // Page not found
 app.all('*', (req, res, next) => {
