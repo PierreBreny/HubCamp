@@ -32,6 +32,10 @@ router.get('/new', (req,res) => {
 // Get campground by :id
 router.get('/:id', wrapAsync(async (req,res) => {
     const campground = await Campground.findById(req.params.id).populate('reviews');
+    if(!campground) {
+        req.flash('error', 'The campground was not found.');
+        return res.redirect('/campgrounds')
+    }
     res.render('campgrounds/show', {campground});
 }))
 
@@ -46,6 +50,10 @@ router.post('/', validateCampground, wrapAsync(async (req, res, next) => {
 // GET Edit campground page
 router.get('/:id/edit', wrapAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
+    if(!campground) {
+        req.flash('error', 'The campground was not found.');
+        return res.redirect('/campgrounds')
+    }
     res.render('campgrounds/edit', {campground});
 }))
 
